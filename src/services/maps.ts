@@ -8,7 +8,7 @@ export const getTravelTime = async (
   destination: string
 ): Promise<TravelTimeResponse> => {
   // TODO: Replace with private maps API key handling
-  const API_KEY = 'API_KEY';
+  const API_KEY = 'AIzaSyDq_c2lopgSe7SpJgNJKorDi5s-ZL8VqPI'; //no private handling, key is restricted to chrome extension use
   
   const url = new URL('https://maps.googleapis.com/maps/api/distancematrix/json');
   url.searchParams.append('origins', origin);

@@ -2,8 +2,8 @@ import { defineManifest } from 'vite-plugin-chrome-extension';
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'LocuLate',
-  version: '1.0.0',
+  name: 'Loculate',
+  version: '1.0.9',
   description: 'Calculate travel times to selected addresses, all in your local window.',
   permissions: [
     'contextMenus',
