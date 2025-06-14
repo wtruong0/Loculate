@@ -9,43 +9,35 @@ declare global {
 const API_KEY = 'AIzaSyDq_c2lopgSe7SpJgNJKorDi5s-ZL8VqPI';
 
 export const getTravelTime = async (origin: string, destination: string): Promise<TravelInfo> => {
-  console.log('Fetching travel time for:', { origin, destination });
+  console.log('Requesting travel time calculation:', { origin, destination });
   
   return new Promise((resolve, reject) => {
-    if (!window.google) {
-      reject(new Error('Google Maps API not loaded'));
-      return;
-    }
-
-    const service = new window.google.maps.DistanceMatrixService();
-    
-    service.getDistanceMatrix(
+    chrome.runtime.sendMessage(
       {
-        origins: [origin],
-        destinations: [destination],
-        travelMode: window.google.maps.TravelMode.DRIVING,
+        type: 'GET_TRAVEL_TIME',
+        origin,
+        destination
       },
-      (response: any, status: string) => {
-        console.log('Distance Matrix API response:', { response, status });
-        
-        if (status === 'OK') {
-          const result = response.rows[0].elements[0];
-          
-          if (result.status === 'OK') {
-            resolve({
-              duration: result.duration.text,
-              distance: result.distance.text,
-              origin,
-              destination,
-            });
-          } else {
-            console.error('Route calculation failed:', result.status);
-            reject(new Error(`Failed to calculate route: ${result.status}`));
-          }
-        } else {
-          console.error('Distance Matrix API error:', status);
-          reject(new Error(`Distance Matrix API error: ${status}`));
+      (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Runtime error:', chrome.runtime.lastError);
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
         }
+
+        if (!response) {
+          reject(new Error('No response from background script'));
+          return;
+        }
+
+        if (!response.success) {
+          console.error('API error:', response.error);
+          reject(new Error(response.error));
+          return;
+        }
+
+        console.log('Travel time calculated:', response.data);
+        resolve(response.data);
       }
     );
   });

@@ -10,6 +10,9 @@ export default defineManifest({
     'contextMenus',
     'activeTab'
   ],
+  host_permissions: [
+    'https://maps.googleapis.com/*'
+  ],
   action: {
     default_popup: 'src/popup/index.html',
     default_icon: {
