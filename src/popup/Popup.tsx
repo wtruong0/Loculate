@@ -1,113 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { getTravelTime } from '../services/maps';
-
-interface TravelInfo {
-  duration: string;
-  distance: string;
-}
+import { getTravelTime, loadGoogleMapsScript } from '../services/maps';
+import { TravelInfo } from '../types';
 
 const Popup: React.FC = () => {
   const [origin, setOrigin] = useState<string>('');
   const [destination, setDestination] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [travelInfo, setTravelInfo] = useState<TravelInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mapsLoaded, setMapsLoaded] = useState<boolean>(false);
 
-  // Load saved origin and destination on component mount
   useEffect(() => {
-    chrome.storage.local.get(['origin', 'destination'], (result) => {
+    // Load Google Maps script
+    loadGoogleMapsScript()
+      .then(() => {
+        console.log('Google Maps script loaded successfully');
+        setMapsLoaded(true);
+      })
+      .catch((error) => {
+        console.error('Failed to load Google Maps script:', error);
+        setError('Failed to load Google Maps. Please try again later.');
+      });
+
+    // Load saved origin
+    chrome.storage.local.get(['origin'], (result) => {
       if (result.origin) {
         setOrigin(result.origin);
       }
-      if (result.destination) {
-        setDestination(result.destination);
+    });
+
+    // Load destination from storage
+    chrome.storage.local.get(['selectedText'], (result) => {
+      if (result.selectedText) {
+        setDestination(result.selectedText);
       }
     });
   }, []);
 
-  // Calculate travel time when both origin and destination are available
   useEffect(() => {
     const calculateTravelTime = async () => {
-      if (origin && destination) {
-        setIsLoading(true);
-        setError(null);
-        try {
-          console.log('Calculating travel time from', origin, 'to', destination);
-          const result = await getTravelTime(origin, destination);
-          console.log('Travel time result:', result);
-          setTravelInfo(result);
-        } catch (err) {
-          console.error('Error calculating travel time:', err);
-          setError('Could not calculate travel time. Please check the addresses and try again.');
-          setTravelInfo(null);
-        } finally {
-          setIsLoading(false);
-        }
+      if (!origin || !destination || !mapsLoaded) return;
+
+      setLoading(true);
+      setError(null);
+      try {
+        console.log('Calculating travel time...');
+        const info = await getTravelTime(origin, destination);
+        console.log('Travel time calculated:', info);
+        setTravelInfo(info);
+      } catch (error) {
+        console.error('Error calculating travel time:', error);
+        setError(error instanceof Error ? error.message : 'Failed to calculate travel time');
+      } finally {
+        setLoading(false);
       }
     };
 
     calculateTravelTime();
-  }, [origin, destination]);
+  }, [origin, destination, mapsLoaded]);
 
-  const saveOrigin = () => {
-    chrome.storage.local.set({ origin }, () => {
-      // Show feedback that location was saved
-      const saveButton = document.getElementById('saveButton');
-      if (saveButton) {
-        const originalText = saveButton.textContent;
-        saveButton.textContent = 'Saved!';
-        setTimeout(() => {
-          if (saveButton) saveButton.textContent = originalText;
-        }, 2000);
-      }
-    });
+  const handleSaveOrigin = () => {
+    chrome.storage.local.set({ origin });
   };
 
   return (
-    <div className="w-80 p-4">
+    <div className="p-4 w-80">
       <h1 className="text-xl font-bold mb-4">LocuLate</h1>
-      <div className="space-y-4">
-        <div className="border p-2 rounded">
-          <label className="block text-sm font-medium mb-1">Home Location</label>
-          <input
-            type="text"
-            value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
-            placeholder="Enter your home address"
-            className="w-full p-2 border rounded"
-          />
-          <button
-            id="saveButton"
-            onClick={saveOrigin}
-            className="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-          >
-            Save Location
-          </button>
-        </div>
-        
-        <div className="border p-2 rounded">
-          <h2 className="text-lg font-semibold mb-2">Travel Time</h2>
-          {destination ? (
-            <div>
-              <p className="text-sm text-gray-600 mb-2">To: {destination}</p>
-              {isLoading ? (
-                <p className="text-gray-600">Calculating...</p>
-              ) : error ? (
-                <p className="text-red-500">{error}</p>
-              ) : travelInfo ? (
-                <div className="space-y-1">
-                  <p className="text-gray-800">Duration: {travelInfo.duration}</p>
-                  <p className="text-gray-800">Distance: {travelInfo.distance}</p>
-                </div>
-              ) : (
-                <p className="text-gray-600">Select an address on any webpage to see travel time</p>
-              )}
-            </div>
-          ) : (
-            <p className="text-gray-600">Select an address on any webpage to see travel time</p>
-          )}
-        </div>
+      
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Home Address</label>
+        <input
+          type="text"
+          value={origin}
+          onChange={(e) => setOrigin(e.target.value)}
+          className="w-full p-2 border rounded"
+          placeholder="Enter your home address"
+        />
+        <button
+          onClick={handleSaveOrigin}
+          className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Save
+        </button>
       </div>
+
+      {destination && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Selected Address</label>
+          <div className="p-2 bg-gray-100 rounded">{destination}</div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-600">Calculating travel time...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="p-3 bg-red-100 text-red-700 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      {travelInfo && !loading && !error && (
+        <div className="bg-green-50 p-4 rounded">
+          <h2 className="font-semibold mb-2">Travel Information</h2>
+          <p>Duration: {travelInfo.duration}</p>
+          <p>Distance: {travelInfo.distance}</p>
+        </div>
+      )}
     </div>
   );
 };
