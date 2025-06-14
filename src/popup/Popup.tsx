@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getTravelTime } from '../services/maps';
+import { loadGoogleMapsScript } from '../services/googleMapsLoader';
 import { TravelInfo } from '../types';
 
 const Popup: React.FC = () => {
@@ -8,8 +9,20 @@ const Popup: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [travelInfo, setTravelInfo] = useState<TravelInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mapsLoaded, setMapsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
+    // Load Google Maps script
+    loadGoogleMapsScript()
+      .then(() => {
+        console.log('Google Maps script loaded successfully');
+        setMapsLoaded(true);
+      })
+      .catch((error) => {
+        console.error('Failed to load Google Maps script:', error);
+        setError('Failed to load Google Maps. Please try again later.');
+      });
+
     // Load saved origin
     chrome.storage.local.get(['origin'], (result) => {
       if (result.origin) {
@@ -27,7 +40,7 @@ const Popup: React.FC = () => {
 
   useEffect(() => {
     const calculateTravelTime = async () => {
-      if (!origin || !destination) return;
+      if (!origin || !destination || !mapsLoaded) return;
 
       setLoading(true);
       setError(null);
@@ -45,7 +58,7 @@ const Popup: React.FC = () => {
     };
 
     calculateTravelTime();
-  }, [origin, destination]);
+  }, [origin, destination, mapsLoaded]);
 
   const handleSaveOrigin = () => {
     chrome.storage.local.set({ origin });

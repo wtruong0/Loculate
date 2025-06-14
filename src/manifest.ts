@@ -27,9 +27,6 @@ export default defineManifest({
     '48': 'public/icons/icon48.png',
     '128': 'public/icons/icon128.png'
   },
-  content_security_policy: {
-    extension_pages: "script-src 'self' https://maps.googleapis.com; object-src 'self'"
-  },
   web_accessible_resources: [{
     resources: ['src/popup/index.html'],
     matches: ['<all_urls>']
