@@ -13,25 +13,16 @@ const Popup: React.FC = () => {
   const [travelInfo, setTravelInfo] = useState<TravelInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load saved origin on component mount
+  // Load saved origin and destination on component mount
   useEffect(() => {
-    chrome.storage.local.get(['origin'], (result) => {
+    chrome.storage.local.get(['origin', 'destination'], (result) => {
       if (result.origin) {
         setOrigin(result.origin);
       }
-    });
-  }, []);
-
-  // Listen for messages from background script
-  useEffect(() => {
-    const messageListener = (message: any) => {
-      if (message.type === 'ADDRESS_SELECTED') {
-        setDestination(message.payload.destination);
+      if (result.destination) {
+        setDestination(result.destination);
       }
-    };
-
-    chrome.runtime.onMessage.addListener(messageListener);
-    return () => chrome.runtime.onMessage.removeListener(messageListener);
+    });
   }, []);
 
   // Calculate travel time when both origin and destination are available
@@ -41,10 +32,13 @@ const Popup: React.FC = () => {
         setIsLoading(true);
         setError(null);
         try {
+          console.log('Calculating travel time from', origin, 'to', destination);
           const result = await getTravelTime(origin, destination);
+          console.log('Travel time result:', result);
           setTravelInfo(result);
         } catch (err) {
-          setError('Could not calculate travel time. Please check the addresses.');
+          console.error('Error calculating travel time:', err);
+          setError('Could not calculate travel time. Please check the addresses and try again.');
           setTravelInfo(null);
         } finally {
           setIsLoading(false);

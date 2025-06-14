@@ -14,12 +14,10 @@ chrome.runtime.onInstalled.addListener(() => {
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'calculateTravelTime' && info.selectionText) {
-    // Send message to popup with selected text
-    chrome.runtime.sendMessage({
-      type: 'ADDRESS_SELECTED',
-      payload: {
-        destination: info.selectionText
-      }
+    // Store the selected text in storage
+    chrome.storage.local.set({ destination: info.selectionText }, () => {
+      // Open the popup
+      chrome.action.openPopup();
     });
   }
 }); 
