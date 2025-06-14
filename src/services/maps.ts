@@ -8,7 +8,7 @@ export const getTravelTime = async (
   destination: string
 ): Promise<TravelTimeResponse> => {
   // TODO: Replace with private maps API key handling
-  const API_KEY = 'YOUR_API_KEY';
+  const API_KEY = 'API_KEY';
   
   const url = new URL('https://maps.googleapis.com/maps/api/distancematrix/json');
   url.searchParams.append('origins', origin);
