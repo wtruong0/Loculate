@@ -1,4 +1,4 @@
-import { defineManifest } from 'vite-plugin-chrome-extension';
+import { defineManifest } from '@crxjs/vite-plugin';
 
 export default defineManifest({
   manifest_version: 3,
