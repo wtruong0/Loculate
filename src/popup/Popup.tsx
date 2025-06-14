@@ -8,12 +8,14 @@ const Popup: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [travelInfo, setTravelInfo] = useState<TravelInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [savedOrigin, setSavedOrigin] = useState<string>('');
 
   useEffect(() => {
     // Load saved origin
     chrome.storage.local.get(['origin'], (result) => {
       if (result.origin) {
         setOrigin(result.origin);
+        setSavedOrigin(result.origin);
       }
     });
 
@@ -25,31 +27,40 @@ const Popup: React.FC = () => {
     });
   }, []);
 
-  useEffect(() => {
-    const calculateTravelTime = async () => {
-      if (!origin || !destination) return;
+  const calculateTravelTime = async (origin: string, destination: string) => {
+    if (!origin || !destination) return;
 
-      setLoading(true);
-      setError(null);
-      try {
-        console.log('Calculating travel time...');
-        const info = await getTravelTime(origin, destination);
-        console.log('Travel time calculated:', info);
-        setTravelInfo(info);
-      } catch (error) {
-        console.error('Error calculating travel time:', error);
-        setError(error instanceof Error ? error.message : 'Failed to calculate travel time');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    calculateTravelTime();
-  }, [origin, destination]);
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('Calculating travel time...');
+      const info = await getTravelTime(origin, destination);
+      console.log('Travel time calculated:', info);
+      setTravelInfo(info);
+    } catch (error) {
+      console.error('Error calculating travel time:', error);
+      setError(error instanceof Error ? error.message : 'Failed to calculate travel time');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSaveOrigin = () => {
-    chrome.storage.local.set({ origin });
+    chrome.storage.local.set({ origin }, () => {
+      setSavedOrigin(origin);
+      // Calculate travel time with new origin
+      if (destination) {
+        calculateTravelTime(origin, destination);
+      }
+    });
   };
+
+  // Calculate travel time when destination changes
+  useEffect(() => {
+    if (savedOrigin && destination) {
+      calculateTravelTime(savedOrigin, destination);
+    }
+  }, [destination]);
 
   return (
     <div className="p-4 w-80">
