@@ -4,7 +4,7 @@ export default defineManifest({
   manifest_version: 3,
   name: 'LocuLate',
   version: '1.0.0',
-  description: 'Calculate travel times toselected addresses, all in your local window.',
+  description: 'Calculate travel times to selected addresses, all in your local window.',
   permissions: [
     'contextMenus',
     'storage',
