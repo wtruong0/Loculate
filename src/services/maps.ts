@@ -17,16 +17,20 @@ export const getTravelTime = async (
   url.searchParams.append('mode', 'driving');
 
   try {
+    console.log('Fetching travel time from Google Maps API...');
     const response = await fetch(url.toString());
     const data = await response.json();
+    console.log('Google Maps API response:', data);
 
     if (data.status !== 'OK') {
-      throw new Error('Failed to fetch travel time');
+      console.error('Google Maps API error:', data.status, data.error_message);
+      throw new Error(`Failed to fetch travel time: ${data.error_message || data.status}`);
     }
 
     const element = data.rows[0].elements[0];
     if (element.status !== 'OK') {
-      throw new Error('Could not calculate route');
+      console.error('Google Maps API route error:', element.status);
+      throw new Error(`Could not calculate route: ${element.status}`);
     }
 
     return {
