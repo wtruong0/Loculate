@@ -2,25 +2,36 @@ import { defineManifest } from '@crxjs/vite-plugin';
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'Loculate',
-  version: '1.0.9',
-  description: 'Calculate travel times to selected addresses, all in your local window.',
+  name: 'LocuLate',
+  version: '1.0.0',
+  description: 'Calculate travel times from selected addresses',
   permissions: [
-    'contextMenus',
     'storage',
-    'activeTab',
-    'scripting'
+    'contextMenus',
+    'activeTab'
   ],
   action: {
-    default_popup: 'src/popup/index.html'
+    default_popup: 'src/popup/index.html',
+    default_icon: {
+      '16': 'public/icons/icon16.png',
+      '48': 'public/icons/icon48.png',
+      '128': 'public/icons/icon128.png'
+    }
   },
   background: {
     service_worker: 'src/background/index.ts',
     type: 'module'
   },
   icons: {
-    '16': 'icons/icon16.png',
-    '48': 'icons/icon48.png',
-    '128': 'icons/icon128.png'
-  }
+    '16': 'public/icons/icon16.png',
+    '48': 'public/icons/icon48.png',
+    '128': 'public/icons/icon128.png'
+  },
+  content_security_policy: {
+    extension_pages: "script-src 'self' https://maps.googleapis.com; object-src 'self'"
+  },
+  web_accessible_resources: [{
+    resources: ['src/popup/index.html'],
+    matches: ['<all_urls>']
+  }]
 }); 
