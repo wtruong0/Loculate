@@ -10,6 +10,9 @@ export default defineConfig({
     react(),
     crx({ manifest })
   ],
+  css: {
+    postcss: './postcss.config.js',
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
