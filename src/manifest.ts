@@ -2,8 +2,8 @@ import { defineManifest } from '@crxjs/vite-plugin';
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'LocuLate',
-  version: '1.0.0',
+  name: 'Loculate',
+  version: '1.2.6',
   description: 'Calculate travel times from selected addresses',
   permissions: [
     'storage',
