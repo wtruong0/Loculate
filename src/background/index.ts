@@ -30,12 +30,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'GET_TRAVEL_TIME') {
     const { origin, destination } = request;
     
-    // Construct the URL for the Distance Matrix API
-    const url = new URL('https://maps.googleapis.com/maps/api/distancematrix/json');
-    url.searchParams.append('origins', origin);
-    url.searchParams.append('destinations', destination);
-    url.searchParams.append('key', 'AIzaSyDq_c2lopgSe7SpJgNJKorDi5s-ZL8VqPI');
-    url.searchParams.append('mode', 'driving');
+    // Construct the URL for our Cloudflare Worker
+    const url = new URL('https://loculate-proxy.willtruong0.workers.dev');
+    url.searchParams.append('origin', origin);
+    url.searchParams.append('destination', destination);
 
     // Make the API request
     fetch(url.toString())

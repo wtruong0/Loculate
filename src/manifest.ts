@@ -11,7 +11,7 @@ export default defineManifest({
     'activeTab'
   ],
   host_permissions: [
-    'https://maps.googleapis.com/*'
+    'https://loculate-proxy.willtruong0.workers.dev/*'
   ],
   action: {
     default_popup: 'src/popup/index.html',
