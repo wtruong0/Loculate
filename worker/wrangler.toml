@@ -3,5 +3,5 @@ main = "src/index.js"
 compatibility_date = "2024-03-15"
 
 [vars]
-# Google Maps API key here
-GOOGLE_MAPS_API_KEY = "AIzaSyDq_c2lopgSe7SpJgNJKorDi5s-ZL8VqPI" 
+# define API key here, inputted secretly with "wrangler secret put GOOGLE_MAPS_API_KEY"
+GOOGLE_MAPS_API_KEY = "" 

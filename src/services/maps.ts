@@ -6,8 +6,6 @@ declare global {
   }
 }
 
-const API_KEY = 'AIzaSyDq_c2lopgSe7SpJgNJKorDi5s-ZL8VqPI';
-
 export const getTravelTime = async (origin: string, destination: string): Promise<TravelInfo> => {
   console.log('Requesting travel time calculation:', { origin, destination });
   
@@ -43,6 +41,7 @@ export const getTravelTime = async (origin: string, destination: string): Promis
   });
 };
 
+// Load Google Maps Places library for address autocomplete
 export const loadGoogleMapsScript = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (window.google) {
@@ -51,7 +50,7 @@ export const loadGoogleMapsScript = (): Promise<void> => {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places`;
+    script.src = 'https://maps.googleapis.com/maps/api/js?libraries=places';
     script.async = true;
     script.defer = true;
     
