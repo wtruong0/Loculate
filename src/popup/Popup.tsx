@@ -64,29 +64,40 @@ const Popup: React.FC = () => {
 
   return (
     <div className="p-4 w-80">
-      <h1 className="text-xl font-bold mb-4">LocuLate</h1>
+      <h1 className="text-xl font-bold mb-4">Loculate</h1>
       
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Home Address</label>
-        <input
-          type="text"
-          value={origin}
-          onChange={(e) => setOrigin(e.target.value)}
-          className="w-full p-2 border rounded"
-          placeholder="Enter your home address"
-        />
-        <button
-          onClick={handleSaveOrigin}
-          className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Save
-        </button>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            className="flex-1 p-2 border rounded"
+            placeholder="Enter your home address"
+          />
+          <button
+            onClick={handleSaveOrigin}
+            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 whitespace-nowrap"
+          >
+            Save
+          </button>
+        </div>
+        
+        {savedOrigin && (
+          <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-200">
+            <p className="text-sm text-gray-600">Saved Home Address:</p>
+            <p className="text-sm font-medium">{savedOrigin}</p>
+          </div>
+        )}
       </div>
 
       {destination && (
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Selected Address</label>
-          <div className="p-2 bg-gray-100 rounded">{destination}</div>
+          <div className="p-2 bg-gray-50 rounded border border-gray-200">
+            <p className="text-sm">{destination}</p>
+          </div>
         </div>
       )}
 
@@ -104,10 +115,16 @@ const Popup: React.FC = () => {
       )}
 
       {travelInfo && !loading && !error && (
-        <div className="bg-green-50 p-4 rounded">
+        <div className="bg-green-50 p-4 rounded border border-green-100">
           <h2 className="font-semibold mb-2">Travel Information</h2>
-          <p>Duration: {travelInfo.duration}</p>
-          <p>Distance: {travelInfo.distance}</p>
+          <div className="space-y-1">
+            <p className="text-sm">
+              <span className="font-medium">Duration:</span> {travelInfo.duration}
+            </p>
+            <p className="text-sm">
+              <span className="font-medium">Distance:</span> {travelInfo.distance}
+            </p>
+          </div>
         </div>
       )}
     </div>
