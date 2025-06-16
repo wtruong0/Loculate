@@ -36,6 +36,18 @@ export default {
       const response = await fetch(apiUrl);
       const data = await response.json();
 
+      if (data.status === 'OK' && data.rows[0].elements[0].status === 'OK') {
+        const element = data.rows[0].elements[0];
+        // Convert distance from meters to miles
+        const distanceInMiles = (element.distance.value / 1609.34).toFixed(1);
+        return new Response(JSON.stringify({
+          duration: element.duration.text,
+          distance: `${distanceInMiles} mi`
+        }), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
       return new Response(JSON.stringify(data), {
         headers: {
           'Content-Type': 'application/json',
