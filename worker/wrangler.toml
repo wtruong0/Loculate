@@ -1,7 +1,10 @@
 name = "loculate-proxy"
 main = "src/index.js"
-compatibility_date = "2024-03-15"
+compatibility_date = "2024-02-20"
 
 [vars]
 # define API key here, inputted secretly with "wrangler secret put GOOGLE_MAPS_API_KEY"
-GOOGLE_MAPS_API_KEY = "" 
+GOOGLE_MAPS_API_KEY = ""
+
+[observability.logs]
+enabled = true
