@@ -39,6 +39,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     fetch(url.toString())
       .then(response => response.json())
       .then(data => {
+        console.log('Background: Received data from worker:', data);
+        
+        // Check if the response has an error
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // If we have duration and distance directly, use them
+        if (data.duration && data.distance) {
+          const travelInfo: TravelInfo = {
+            duration: data.duration,
+            distance: data.distance,
+            origin,
+            destination
+          };
+          console.log('Background: Sending travel info to popup:', travelInfo);
+          sendResponse({ success: true, data: travelInfo });
+          return;
+        }
+
+        // Otherwise, check for Google Maps API response format
         if (data.status !== 'OK') {
           throw new Error(`API Error: ${data.error_message || data.status}`);
         }
@@ -54,6 +75,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           origin,
           destination
         };
+        console.log('Background: Sending travel info to popup:', travelInfo);
 
         sendResponse({ success: true, data: travelInfo });
       })
