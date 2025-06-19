@@ -11,6 +11,7 @@ const Popup: React.FC = () => {
   const [savedOrigin, setSavedOrigin] = useState<string>('');
   const [isSavedAddressExpanded, setIsSavedAddressExpanded] = useState<boolean>(true);
   const [copySuccess, setCopySuccess] = useState<{ [key: string]: boolean }>({});
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     // Load saved origin
@@ -27,7 +28,36 @@ const Popup: React.FC = () => {
         setDestination(result.selectedText);
       }
     });
+
+    // On mount, check system preference and chrome.storage
+    chrome.storage.local.get(['theme'], (result) => {
+      if (result.theme) {
+        setTheme(result.theme);
+      } else {
+        // Check system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+      }
+    });
   }, []);
+
+  // Persist theme changes
+  useEffect(() => {
+    chrome.storage.local.set({ theme });
+  }, [theme]);
+
+  // Add this useEffect to toggle the 'dark' class on <body> and set background color
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.add('dark');
+      document.body.style.backgroundColor = '#131313';
+    } else {
+      document.body.classList.remove('dark');
+      document.body.style.backgroundColor = '';
+    }
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
   const calculateTravelTime = async (origin: string, destination: string) => {
     if (!origin || !destination) return;
@@ -77,27 +107,54 @@ const Popup: React.FC = () => {
   }, [destination]);
 
   return (
-    <div className="rounded-lg bg-white p-2 min-h-[200px] w-[320px] border-4 border-white">
-      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-blue-600">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          className="h-6 w-6 text-blue-600" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+    <div className="rounded-lg border-4 border-white dark:border-dark-bg min-h-[200px] w-[320px] bg-white dark:bg-dark-bg transition-colors duration-300 p-2">
+      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-blue-600 justify-between">
+        <div className="flex items-center gap-2">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6 text-blue-600 dark:text-loculate-blue" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M16.2 7.8l-2 6.3-6.4 2.1 2-6.3z"/>
+          </svg>
+          <h1 className="text-2xl font-bold text-blue-600 dark:text-loculate-blue">Loculate</h1>
+        </div>
+        <button
+          onClick={toggleTheme}
+          aria-label={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+          className="relative w-14 h-7 flex items-center bg-gray-200 dark:bg-gray-700 rounded-full p-1 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          tabIndex={0}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTheme(); } }}
         >
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M16.2 7.8l-2 6.3-6.4 2.1 2-6.3z"/>
-        </svg>
-        <h1 className="text-2xl font-bold text-blue-600">Loculate</h1>
+          <span className="absolute left-2 text-yellow-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 7.07l-1.41-1.41M6.34 6.34L4.93 4.93m12.02 0l-1.41 1.41M6.34 17.66l-1.41 1.41" />
+            </svg>
+          </span>
+          <span className="absolute right-2 text-blue-700 dark:text-blue-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+            </svg>
+          </span>
+          <span
+            className={
+              'absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300' +
+              (theme === 'dark' ? ' translate-x-7' : '')
+            }
+          />
+        </button>
       </div>
       
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1 text-gray-700 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-loculate-blue flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-loculate-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
           Adjust Origin Address
@@ -108,13 +165,13 @@ const Popup: React.FC = () => {
             value={origin}
             onChange={(e) => setOrigin(e.target.value)}
             placeholder="Enter your origin address"
-            className="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-black dark:bg-dark-card dark:text-loculate-blue border-gray-200 dark:border-dark-inputBorder"
           />
           <button
             onClick={handleSaveOrigin}
-            className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 whitespace-nowrap transition-colors duration-200 flex items-center gap-1"
+            className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white dark:text-dark-card rounded-lg hover:from-blue-600 hover:to-blue-700 whitespace-nowrap transition-colors duration-200 flex items-center gap-1"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 dark:text-dark-card" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             Save
@@ -124,10 +181,10 @@ const Popup: React.FC = () => {
           <div className="mt-2">
             <button
               onClick={() => setIsSavedAddressExpanded(!isSavedAddressExpanded)}
-              className="w-full flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-lg border border-gray-200 hover:from-gray-100 hover:to-gray-200 transition-colors duration-200"
+              className="w-full flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-card dark:to-dark-card rounded-t-lg border border-gray-200 dark:border-gray-700 transition-colors duration-200"
             >
-              <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <span className="text-sm font-medium text-gray-700 dark:text-loculate-blue flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-loculate-blue" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                   <polyline points="17 21 17 13 7 13 7 21"></polyline>
                   <polyline points="7 3 7 8 15 8"></polyline>
@@ -136,7 +193,7 @@ const Popup: React.FC = () => {
               </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`h-4 w-4 transform transition-transform duration-200 ${isSavedAddressExpanded ? 'rotate-180' : ''}`}
+                className={`h-4 w-4 transform transition-transform duration-200 ${isSavedAddressExpanded ? 'rotate-180' : ''} dark:text-loculate-blue`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -149,12 +206,12 @@ const Popup: React.FC = () => {
                 isSavedAddressExpanded ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <div className="p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-b-lg border-x border-b border-gray-200">
+              <div className="p-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-card dark:to-dark-card rounded-b-lg border-x border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-800">{savedOrigin}</p>
+                  <p className="text-sm text-gray-800 dark:text-loculate-blue">{savedOrigin}</p>
                   <button
                     onClick={() => handleCopy(savedOrigin, 'saved')}
-                    className="p-1 hover:bg-gray-200 rounded transition-colors duration-200"
+                    className="p-1 hover:bg-gray-200 dark:hover:bg-dark-bg rounded transition-colors duration-200 dark:text-loculate-blue"
                     title="Copy address"
                   >
                     {copySuccess['saved'] ? (
@@ -176,18 +233,18 @@ const Popup: React.FC = () => {
 
       {destination && (
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1 text-gray-700 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-loculate-blue flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-loculate-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             Selected Address
           </label>
-          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 flex items-center justify-between">
-            <span className="text-sm text-gray-600">{destination}</span>
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-dark-card dark:border-gray-700 flex items-center justify-between">
+            <span className="text-sm text-gray-600 dark:text-loculate-blue">{destination}</span>
             <button
               onClick={() => handleCopy(destination, 'selected')}
-              className="p-1 hover:bg-gray-200 rounded transition-colors duration-200 ml-2"
+              className="p-1 hover:bg-gray-200 dark:hover:bg-dark-bg rounded transition-colors duration-200 ml-2 dark:text-loculate-blue"
               title="Copy selected address"
             >
               {copySuccess['selected'] ? (
@@ -225,26 +282,28 @@ const Popup: React.FC = () => {
         className={`transition-all duration-300 ${travelInfo && !loading && !error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'} mt-4`}
       >
         {travelInfo && !loading && !error && (
-          <div className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 p-4 rounded-lg border border-green-200">
-            <h2 className="text-lg font-semibold mb-3 text-green-800 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="rounded-lg border border-green-200 dark:border-green-accent p-4 bg-gradient-to-br from-green-50 via-green-100 to-green-50 dark:bg-green-infoBg dark:bg-none">
+            <h2 className="text-lg font-semibold mb-3 text-green-800 dark:text-green-accent flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-800 dark:text-green-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
               Travel Information
             </h2>
-            <div className="border-b border-green-800 mb-3"></div>
+            <div className="border-b border-green-800 dark:border-green-accent mb-3"></div>
             <div className="space-y-2">
               <p className="text-sm flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600 dark:text-green-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="font-medium text-green-800">Duration:</span> {travelInfo.duration}
+                <span className="font-medium text-green-800 dark:text-green-accent">Duration:</span>
+                <span className="font-medium text-green-800 dark:text-green-accent">{travelInfo.duration}</span>
               </p>
               <p className="text-sm flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600 dark:text-green-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
-                <span className="font-medium text-green-800">Distance:</span> {travelInfo.distance}
+                <span className="font-medium text-green-800 dark:text-green-accent">Distance:</span>
+                <span className="font-medium text-green-800 dark:text-green-accent">{travelInfo.distance}</span>
               </p>
             </div>
           </div>

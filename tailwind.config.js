@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
+  darkMode: 'class',
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
     "./src/popup/index.html",
@@ -30,6 +31,20 @@ export default {
           700: '#15803d',
           800: '#166534',
           900: '#14532d',
+        },
+        loculate: {
+          blue: '#2563eb',
+        },
+        dark: {
+          bg: '#131313',
+          card: '#0a0817',
+          inputBorder: '#232323',
+        },
+        green: {
+          light: '#bbf7d0',
+          dark: '#166534',
+          accent: '#0b3b1d',
+          infoBg: '#107837',
         },
       },
       transitionDuration: {
