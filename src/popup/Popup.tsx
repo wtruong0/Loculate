@@ -77,7 +77,7 @@ const Popup: React.FC = () => {
   }, [destination]);
 
   return (
-    <div className="p-4 w-80 bg-gradient-to-b from-white via-gray-50 to-gray-100">
+    <div className="rounded-lg bg-white p-2 min-h-[200px] w-[320px] border-4 border-white">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-blue-600">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -149,7 +149,7 @@ const Popup: React.FC = () => {
             >
               <div className="p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-b-lg border-x border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-800">{savedOrigin}</p>
+                  <p className="text-sm text-gray-800">{savedOrigin}</p>
                   <button
                     onClick={() => handleCopy(savedOrigin, 'saved')}
                     className="p-1 hover:bg-gray-200 rounded transition-colors duration-200"
@@ -179,12 +179,25 @@ const Popup: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            Selected Address
+            Selected
           </label>
-          <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-            <p className="text-sm text-gray-600">
-              <span className="font-medium">Selected Address:</span> {destination}
-            </p>
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 flex items-center justify-between">
+            <span className="text-sm text-gray-600">Selected: {destination}</span>
+            <button
+              onClick={() => handleCopy(destination, 'selected')}
+              className="p-1 hover:bg-gray-200 rounded transition-colors duration-200 ml-2"
+              title="Copy selected address"
+            >
+              {copySuccess['selected'] ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
       )}
@@ -205,31 +218,36 @@ const Popup: React.FC = () => {
         </div>
       )}
 
-      {travelInfo && !loading && !error && (
-        <div className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 p-4 rounded-lg border border-green-200">
-          <h2 className="text-lg font-semibold mb-3 text-green-800 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-            </svg>
-            Travel Information
-          </h2>
-          <div className="border-b border-green-800 mb-3"></div>
-          <div className="space-y-2">
-            <p className="text-sm flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      {/* Travel Information Box with animation */}
+      <div
+        className={`transition-all duration-300 ${travelInfo && !loading && !error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'} mt-4`}
+      >
+        {travelInfo && !loading && !error && (
+          <div className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 p-4 rounded-lg border border-green-200">
+            <h2 className="text-lg font-semibold mb-3 text-green-800 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
-              <span className="font-medium text-green-800">Duration:</span> {travelInfo.duration}
-            </p>
-            <p className="text-sm flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <span className="font-medium text-green-800">Distance:</span> {travelInfo.distance}
-            </p>
+              Travel Information
+            </h2>
+            <div className="border-b border-green-800 mb-3"></div>
+            <div className="space-y-2">
+              <p className="text-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-medium text-green-800">Duration:</span> {travelInfo.duration}
+              </p>
+              <p className="text-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <span className="font-medium text-green-800">Distance:</span> {travelInfo.distance}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
