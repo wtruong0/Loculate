@@ -100,7 +100,7 @@ const Popup: React.FC = () => {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
-          Origin Address
+          Adjust Origin Address
         </label>
         <div className="flex gap-2">
           <input
@@ -127,8 +127,10 @@ const Popup: React.FC = () => {
               className="w-full flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-lg border border-gray-200 hover:from-gray-100 hover:to-gray-200 transition-colors duration-200"
             >
               <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
                 </svg>
                 Saved Origin Address
               </span>
@@ -179,10 +181,10 @@ const Popup: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            Selected
+            Selected Address
           </label>
           <div className="p-3 bg-gray-50 rounded-md border border-gray-200 flex items-center justify-between">
-            <span className="text-sm text-gray-600">Selected: {destination}</span>
+            <span className="text-sm text-gray-600">{destination}</span>
             <button
               onClick={() => handleCopy(destination, 'selected')}
               className="p-1 hover:bg-gray-200 rounded transition-colors duration-200 ml-2"
