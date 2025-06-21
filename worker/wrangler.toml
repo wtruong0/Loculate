@@ -8,3 +8,5 @@ GOOGLE_MAPS_API_KEY = ""
 
 [observability.logs]
 enabled = true
+invocation_logs = false
+head_sampling_rate = 0

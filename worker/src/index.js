@@ -1,83 +1,86 @@
-export default {
-  async fetch(request, env) {
-    console.log('Worker: Received request:', request.url);
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  try {
+    // Parse URL to get query parameters
+    const url = new URL(request.url)
+    const origin = url.searchParams.get('origin')
+    const destination = url.searchParams.get('destination')
     
-    // Handle CORS preflight requests
-    if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-        },
-      });
+    // Log generic request info (no sensitive data)
+    console.log('Worker: Processing travel request')
+    
+    // Validate required parameters
+    if (!origin || !destination) {
+      console.log('Worker: Missing required parameters')
+      return new Response(JSON.stringify({ error: 'Missing origin or destination parameter' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
     }
-
-    // Only allow GET requests
-    if (request.method !== 'GET') {
-      return new Response('Method not allowed', { status: 405 });
+    
+    // Get API key from environment
+    const apiKey = GOOGLE_MAPS_API_KEY
+    if (!apiKey) {
+      console.log('Worker: API key not configured')
+      return new Response(JSON.stringify({ error: 'API key not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      })
     }
-
-    try {
-      const url = new URL(request.url);
-      const destination = url.searchParams.get('destination');
-      const origin = url.searchParams.get('origin');
-      console.log('Worker: Parsed parameters:', { origin, destination });
-
-      if (!destination || !origin) {
-        console.log('Worker: Missing parameters');
-        return new Response('Missing required parameters: origin and destination', { 
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-          }
-        });
-      }
-
-      const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${env.GOOGLE_MAPS_API_KEY}`;
-      console.log('Worker: Calling Google Maps API:', apiUrl);
-
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      console.log('Worker: Google Maps API response:', data);
-
-      if (data.status === 'OK' && data.rows[0].elements[0].status === 'OK') {
-        const element = data.rows[0].elements[0];
-        console.log('Worker: Original distance in meters:', element.distance.value);
-        // Convert distance from meters to miles and round to nearest tenth
-        const distanceInMiles = Math.round(element.distance.value * 0.000621371 * 10) / 10;
-        console.log('Worker: Converted distance in miles:', distanceInMiles);
+    
+    // Construct Google Maps API URL
+    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`
+    
+    console.log('Worker: Calling Google Maps API')
+    
+    // Make request to Google Maps API
+    const response = await fetch(apiUrl)
+    const data = await response.json()
+    
+    if (data.status === 'OK') {
+      const element = data.rows[0].elements[0]
+      
+      if (element.status === 'OK') {
+        console.log('Worker: API response received successfully')
+        
+        // Convert meters to miles
+        const distanceInMeters = element.distance.value
+        const distanceInMiles = Math.round((distanceInMeters * 0.000621371) * 10) / 10
+        
+        console.log('Worker: Distance converted to miles')
+        
         const responseData = {
           duration: element.duration.text,
-          distance: `${distanceInMiles} mi`
-        };
-        console.log('Worker: Sending response:', responseData);
+          distance: `${distanceInMiles} miles`
+        }
+        
+        console.log('Worker: Sending response to client')
+        
         return new Response(JSON.stringify(responseData), {
-          headers: { 
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
+          headers: { 'Content-Type': 'application/json' }
+        })
+      } else {
+        console.log('Worker: Google Maps API returned error status')
+        return new Response(JSON.stringify({ error: 'Unable to calculate route' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        })
       }
-
-      console.log('Worker: API error response:', data);
-      return new Response(JSON.stringify(data), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-
-    } catch (error) {
-      console.log('Worker: Error caught:', error);
-      return new Response(JSON.stringify({ error: 'Internal server error' }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
+    } else {
+      console.log('Worker: Google Maps API error response')
+      return new Response(JSON.stringify({ error: 'Google Maps API error' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
     }
-  },
-}; 
+  } catch (error) {
+    console.log('Worker: Error processing request')
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
+} 
