@@ -93,12 +93,12 @@ const Popup: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Calculating travel time...');
+      console.log('Popup: Calculating travel time...');
       const info = await getTravelTime(origin, destination);
-      console.log('Travel time calculated:', info);
+      console.log('Popup: Travel calculation completed successfully');
       setTravelInfo(info);
     } catch (error) {
-      console.error('Error calculating travel time:', error);
+      console.error('Popup: Travel calculation failed:', error);
       setError(error instanceof Error ? error.message : 'Failed to calculate travel time');
     } finally {
       setLoading(false);

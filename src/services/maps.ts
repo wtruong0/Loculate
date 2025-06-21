@@ -7,7 +7,7 @@ declare global {
 }
 
 export const getTravelTime = async (origin: string, destination: string): Promise<TravelInfo> => {
-  console.log('Requesting travel time calculation:', { origin, destination });
+  console.log('Maps Service: Initiating travel time request');
   
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(
@@ -18,7 +18,7 @@ export const getTravelTime = async (origin: string, destination: string): Promis
       },
       (response) => {
         if (chrome.runtime.lastError) {
-          console.error('Runtime error:', chrome.runtime.lastError);
+          console.error('Maps Service: Runtime error occurred');
           reject(new Error(chrome.runtime.lastError.message));
           return;
         }
@@ -29,13 +29,19 @@ export const getTravelTime = async (origin: string, destination: string): Promis
         }
 
         if (!response.success) {
-          console.error('API error:', response.error);
+          console.error('Maps Service: API request failed');
           reject(new Error(response.error));
           return;
         }
-
-        console.log('Travel time calculated:', response.data);
-        resolve(response.data);
+        
+        console.log('Maps Service: Travel time request completed successfully');
+        
+        // Add origin and destination to match TravelInfo interface
+        resolve({
+          ...response.data,
+          origin,
+          destination
+        });
       }
     );
   });
