@@ -3,8 +3,8 @@ import { defineManifest } from '@crxjs/vite-plugin';
 export default defineManifest({
   manifest_version: 3,
   name: 'Loculate',
-  version: '1.2.6',
-  description: 'Calculate travel times from selected addresses',
+  version: '1.3.6',
+  description: 'Select a location in text and get travel info, simply with your mouse! Powered by Google Maps Distance Matrix API.',
   permissions: [
     'storage',
     'contextMenus',
