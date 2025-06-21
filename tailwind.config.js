@@ -50,6 +50,50 @@ module.exports = {
       transitionDuration: {
         '200': '200ms',
       },
+      keyframes: {
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-2px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(2px)' },
+        },
+        sparkle: {
+          '0%': { 
+            transform: 'scale(0) rotate(0deg)',
+            opacity: '0'
+          },
+          '20%': { 
+            transform: 'scale(0.8) rotate(72deg)',
+            opacity: '0.8'
+          },
+          '50%': { 
+            transform: 'scale(1) rotate(180deg)',
+            opacity: '1'
+          },
+          '80%': { 
+            transform: 'scale(0.8) rotate(288deg)',
+            opacity: '0.8'
+          },
+          '100%': { 
+            transform: 'scale(0) rotate(360deg)',
+            opacity: '0'
+          },
+        },
+        slideDown: {
+          '0%': { 
+            transform: 'translateY(-10px)',
+            opacity: '0'
+          },
+          '100%': { 
+            transform: 'translateY(0)',
+            opacity: '1'
+          },
+        },
+      },
+      animation: {
+        shake: 'shake 0.5s ease-in-out',
+        sparkle: 'sparkle 0.8s ease-out',
+        slideDown: 'slideDown 0.3s ease-out',
+      },
     },
   },
   plugins: [],
