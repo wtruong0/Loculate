@@ -8,12 +8,13 @@
 
 To install Loculate in your Chrome browser:
 
-1. [Download the extension folder](https://github.com/wtruong0/Loculate/releases/latest/download/Loculate.zip).
+1. [Download the extension folder](https://drive.google.com/uc?export=download&id=1s3M8wfkQVjGNE1avqYN5bvp-61NLIHhg).
 2. Extract the Loculate folder from inside Loculate.zip that was just downloaded.
-3. Open Chrome and go to: [chrome://extensions/](chrome://extensions)
+3. Open Chrome and copy `chrome://extensions/` into your search bar, or find the Extensions page in your settings.
 4. Enable **Developer mode** (toggle at the top right).
 5. Click "**Load unpacked**" in the top left.
 6. Select the `Loculate` folder you extracted, and enjoy!
+
 (for more help, a installation & use tutorial will be posted soon)
 
 ---
