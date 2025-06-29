@@ -1,6 +1,6 @@
 # 🚗 Loculate Chrome Extension
 
-**Loculate** helps you instantly calculate travel info to any address, zipcode, city, anywhere! After saving your origin location, simply two clicks gets you drive time and distance to your selected location!
+**Loculate** (**loc**ation + calc**ulate**) helps you instantly obtain travel info to an address, zipcode, city, anywhere! After saving your origin location, a few clicks gets you drive time and distance to any selected location!
 
 ---
 
@@ -14,6 +14,8 @@ To install Loculate in your Chrome browser:
 4. Enable **Developer mode** (via toggle at the top right).
 5. Click "**Load unpacked**" in the top left.
 6. Select the `loculate-extension` folder you just extracted, and that's all! 🎉
+
+[Click here for a **Full Tutorial Video** (installation & usage)](https://www.youtube.com/watch?v=dWJErEyCuMs)
 
 ---
 
