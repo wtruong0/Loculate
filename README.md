@@ -49,8 +49,8 @@ Enjoy browsing with Loculate!
 
 ## ✍️ Credits
 
-Programmed by **Will Truong**
+Programmed by [**Will Truong**](https://www.linkedin.com/in/truongw/)
 
-Icons designed by Sarah Nguyen and Will Truong
+Icons designed by [Sarah Nguyen](https://www.linkedin.com/in/sarah-nguyen-221808321/) and Will Truong
 
 Licensed under MIT
